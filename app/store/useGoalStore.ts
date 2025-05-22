@@ -1,3 +1,4 @@
+
 import { create } from "zustand";
 import { Goal, GoalData } from "~/models/goal";
 import { v4 as uuidv4 } from "uuid";
@@ -47,14 +48,14 @@ export const useGoalStore = create(
           goals: state.goals.filter((goal) => goal.id !== id),
         })),
       resetRepeatingGoals: () =>
-        set((state) => ({
-          goals: state.goals.map((goal) => {
-            if (goal.shouldReset()) {
-              return new Goal({ ...goal.toJSON(), completed: false });
-            }
-            return goal;
-          }),
-        })),
+  set((state) => ({
+  goals: state.goals.map((goal) => {
+    if (goal.shouldReset()) {
+      return new Goal({ ...goal.toJSON(), completed: false });
+    }
+    return goal;
+  }),
+})),
       importGoals: (goals) =>
         set(() => ({
           goals: goals.map((data) => new Goal(data)),

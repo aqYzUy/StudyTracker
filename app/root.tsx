@@ -1,3 +1,5 @@
+// app/root.tsx
+
 import type { LinksFunction, MetaFunction } from "@remix-run/node";
 import {
   Links,
@@ -7,21 +9,16 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
-import stylesheet from "../app/tailwind.css?url";
-import { useEffect } from "react";
-import { installGlobals } from "@remix-run/node";
-import { useLocation } from "react-router-dom";
-import { useMatches } from "@remix-run/react";
+
+import stylesheet from "./tailwind.css";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
 ];
 
-
-
 export const meta: MetaFunction = () => [
   { charset: "utf-8" },
-  { title: "StudyTracker - Dein Lernbegleiter" },
+  { title: "StudyTracker - Your Learning Companion" },
   { name: "viewport", content: "width=device-width, initial-scale=1" },
 ];
 

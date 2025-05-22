@@ -2,13 +2,11 @@
   "name": "remix-studytracker",
   "private": true,
   "sideEffects": false,
-
   "scripts": {
-  "dev": "remix dev",
-  "build": "remix build",
-  "start": "remix-serve build"
-}
-,
+    "dev": "remix dev",
+    "build": "remix build",
+    "start": "remix-serve build"
+  },
   "dependencies": {
     "@remix-run/node": "^2.12.1",
     "@remix-run/react": "^2.12.1",
@@ -23,9 +21,8 @@
   },
   "devDependencies": {
     "@remix-run/dev": "^2.12.1",
-    "@remix-run/vite": "^1.20.2",
     "@tailwindcss/forms": "^0.5.9",
-    "@types/chart.js": "^3.0.0",
+    "@types/chart.js": "^4.0.1",
     "@types/react": "^18.3.8",
     "@types/react-dom": "^18.3.0",
     "@types/uuid": "^10.0.0",
