@@ -1,7 +1,7 @@
-import { create } from 'zustand';
-import { Goal, GoalData } from '~/models/goal';
-import { v4 as uuidv4 } from 'uuid';
-import { persist, createJSONStorage, StateStorage } from 'zustand/middleware';
+import { create } from "zustand";
+import { Goal, GoalData } from "~/models/goal";
+import { v4 as uuidv4 } from "uuid";
+import { persist, createJSONStorage, StateStorage } from "zustand/middleware";
 
 // Benutzerdefinierter Storage-Adapter, der Goal-Instanzen rekonstruiert
 const goalStorage: StateStorage = {
@@ -11,12 +11,11 @@ const goalStorage: StateStorage = {
     try {
       const parsed = JSON.parse(value);
       if (parsed.state && Array.isArray(parsed.state.goals)) {
-        parsed.state.goals = parsed.state.goals.map((data: any) => {
-          // Sicherstellen, dass die Daten die erforderlichen Felder haben
+        parsed.state.goals = parsed.state.goals.map((data: GoalData) => {
           const validData: GoalData = {
             id: data.id || uuidv4(),
-            title: data.title || 'Untitled',
-            category: data.category || 'Uncategorized',
+            title: data.title || "Untitled",
+            category: data.category || "Uncategorized",
             completed: data.completed ?? false,
             repeatInterval: data.repeatInterval,
             lastCompleted: data.lastCompleted,
@@ -25,14 +24,14 @@ const goalStorage: StateStorage = {
           return new Goal(validData);
         });
       }
-      return parsed;
+      return JSON.stringify(parsed);
     } catch (err) {
-      console.error('Fehler beim Parsen von localStorage:', err);
-      return null; // Fallback: leeren Zustand zurückgeben
+      console.error("Fehler beim Parsen von localStorage:", err);
+      return null;
     }
   },
   setItem: (name, value) => {
-    localStorage.setItem(name, JSON.stringify(value));
+    localStorage.setItem(name, value);
   },
   removeItem: (name) => {
     localStorage.removeItem(name);
@@ -93,7 +92,18 @@ export const useGoalStore = create(
         })),
       importGoals: (goals) =>
         set(() => ({
-          goals: goals.map((data) => new Goal(data)),
+          goals: goals.map((data) => {
+            const validData: GoalData = {
+              id: data.id || uuidv4(),
+              title: data.title || "Untitled",
+              category: data.category || "Uncategorized",
+              completed: data.completed ?? false,
+              repeatInterval: data.repeatInterval,
+              lastCompleted: data.lastCompleted,
+              deadline: data.deadline,
+            };
+            return new Goal(validData);
+          }),
         })),
       updateDeadline: (id, deadline) =>
         set((state) => ({
@@ -103,7 +113,7 @@ export const useGoalStore = create(
         })),
     }),
     {
-      name: 'goals-storage',
+      name: "goals-storage",
       storage: createJSONStorage(() => goalStorage),
     }
   )
