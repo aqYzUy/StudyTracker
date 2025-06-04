@@ -34,6 +34,9 @@ export default function GoalList() {
             <ul className="space-y-3 mt-4">
               {goals.map((goal: Goal) => {
                 const isOverdue = typeof goal.isOverdue === "function" ? goal.isOverdue() : false;
+                const displayDeadline = goal.deadline instanceof Date && !isNaN(goal.deadline.getTime())
+                  ? goal.deadline.toLocaleDateString()
+                  : "Invalid Date";
                 return (
                   <li
                     key={goal.id}
@@ -65,7 +68,7 @@ export default function GoalList() {
                         {goal.deadline && (
                           <span className="ml-2 text-sm text-gray-500 dark:text-gray-400">
                             <FaClock className={isOverdue ? "text-red-500" : ""} />{" "}
-                            {goal.deadline.toLocaleDateString()}
+                            {displayDeadline}
                           </span>
                         )}
                       </span>
