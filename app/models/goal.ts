@@ -24,7 +24,13 @@ export class Goal {
     this.completed = data.completed;
     this.repeatInterval = data.repeatInterval;
     this.lastCompleted = data.lastCompleted ? new Date(data.lastCompleted) : undefined;
-    this.deadline = data.deadline ? new Date(data.deadline) : undefined;
+    // Validierung für deadline
+    this.deadline = data.deadline ? this.validateDate(data.deadline) : undefined;
+  }
+
+  private validateDate(dateStr: string): Date | undefined {
+    const date = new Date(dateStr);
+    return isNaN(date.getTime()) ? undefined : date; // Rückgabe undefined bei ungültigem Datum
   }
 
   toggleCompleted() {
