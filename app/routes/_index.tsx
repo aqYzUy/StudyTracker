@@ -41,12 +41,22 @@ export default function Index() {
           importGoals(importedGoals);
           e.target.value = ""; // Zurücksetzen des File-Inputs
         } catch (err) {
+          console.error("Fehler beim Import:", err);
           alert("Ungültiges Dateiformat");
         }
       };
       reader.readAsText(file);
     }
   };
+
+  // Debugging: Überprüfe die Struktur der goals
+  useEffect(() => {
+    goals.forEach((goal) => {
+      if (!(goal instanceof Goal) || typeof goal.isOverdue !== "function") {
+        console.warn("Ungültiges Goal-Objekt gefunden:", goal);
+      }
+    });
+  }, [goals]);
 
   return (
     <div className="min-h-screen p-6">
