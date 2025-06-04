@@ -6,7 +6,7 @@ import Dashboard from "~/components/Dashboard";
 import ChartComponent from "~/components/ChartComponent";
 import Notification from "~/components/Notification";
 import { useGoalStore } from "~/store/useGoalStore";
-import { GoalData, Goal } from "~/models/goal"; // Importiere Goal-Klasse
+import { GoalData, Goal } from "~/models/goal";
 
 export default function Index() {
   const resetRepeatingGoals = useGoalStore((state) => state.resetRepeatingGoals);
