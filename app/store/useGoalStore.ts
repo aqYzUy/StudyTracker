@@ -8,12 +8,28 @@ const goalStorage: StateStorage = {
   getItem: (name) => {
     const value = localStorage.getItem(name);
     if (!value) return null;
-    const parsed = JSON.parse(value);
-    // Konvertiere goals zurück in Goal-Instanzen
-    if (parsed.state && Array.isArray(parsed.state.goals)) {
-      parsed.state.goals = parsed.state.goals.map((data: GoalData) => new Goal(data));
+    try {
+      const parsed = JSON.parse(value);
+      if (parsed.state && Array.isArray(parsed.state.goals)) {
+        parsed.state.goals = parsed.state.goals.map((data: any) => {
+          // Sicherstellen, dass die Daten die erforderlichen Felder haben
+          const validData: GoalData = {
+            id: data.id || uuidv4(),
+            title: data.title || 'Untitled',
+            category: data.category || 'Uncategorized',
+            completed: data.completed ?? false,
+            repeatInterval: data.repeatInterval,
+            lastCompleted: data.lastCompleted,
+            deadline: data.deadline,
+          };
+          return new Goal(validData);
+        });
+      }
+      return parsed;
+    } catch (err) {
+      console.error('Fehler beim Parsen von localStorage:', err);
+      return null; // Fallback: leeren Zustand zurückgeben
     }
-    return parsed;
   },
   setItem: (name, value) => {
     localStorage.setItem(name, JSON.stringify(value));
