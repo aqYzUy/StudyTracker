@@ -34,6 +34,10 @@ export default function GoalList() {
             <ul className="space-y-3 mt-4">
               {goals.map((goal: Goal) => {
                 const isOverdue = typeof goal.isOverdue === "function" ? goal.isOverdue() : false;
+                // Debugging: Überprüfe den Typ von deadline
+                if (goal.deadline && !(goal.deadline instanceof Date)) {
+                  console.warn(`Ungültiges deadline-Objekt für Goal ${goal.id}:`, goal.deadline);
+                }
                 const displayDeadline = goal.deadline instanceof Date && !isNaN(goal.deadline.getTime())
                   ? goal.deadline.toLocaleDateString()
                   : "Invalid Date";
@@ -83,7 +87,7 @@ export default function GoalList() {
                       </button>
                       <input
                         type="date"
-                        defaultValue={goal.deadline?.toISOString().split("T")[0]}
+                        defaultValue={goal.deadline?.toISOString().split("T")[0] || ""}
                         onChange={(e) => updateDeadline(goal.id as string, e.target.value)}
                         className="p-1 rounded-md border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                       />
