@@ -18,26 +18,26 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 export default function ChartComponent() {
   const goals = useGoalStore((state) => state.goals);
 
-  // Definiere hier die drei festen Kategorien in der gewünschten Reihenfolge:
-  const fixedCategories = ["English", "Math", "General"];
+  // Füge hier "Biologie" als vierte feste Kategorie hinzu:
+  const fixedCategories = ["English", "Math", "General", "Biologie"];
 
-  // Berechne mit useMemo einmal den Durchschnitts-Progress pro dieser festen Kategorie:
+  // Berechne mittels useMemo den Durchschnitts-Progress pro dieser festen Kategorie:
   const { labels, dataValues } = useMemo(() => {
-    // Erstelle ein Mapping von Kategorie → Array aller Progress-Werte (0 oder 1) in dieser Kategorie
+    // Mapping von Kategorie → Array aller Progress-Werte (0 oder 1)
     const progressByCategory: Record<string, number[]> = {
       English: [],
       Math: [],
       General: [],
+      Biologie: [], // Neu hinzugefügt
     };
 
     // Fülle das Mapping: für jedes Goal den progress()-Wert in das jeweilige Array pushen
     goals.forEach((g: Goal) => {
-      // Falls eine Aufgabe einer dieser drei Kategorien entspricht, nimm sie auf
+      // Falls die Aufgabe zu einer der vier Kategorien gehört, pushen
       if (fixedCategories.includes(g.category)) {
-        // progress() liefert 0 oder 1
         progressByCategory[g.category].push(g.progress());
       }
-      // Falls du irgendwann noch andere Kategorien anlegst, ignorieren wir sie hier bewusst
+      // Alle anderen Kategorien ignorieren wir weiterhin
     });
 
     // Für jede fixe Kategorie: Durchschnitt berechnen oder 0, falls keine Goals
@@ -46,7 +46,6 @@ export default function ChartComponent() {
       if (!arr || arr.length === 0) {
         return 0;
       }
-      // Summe aller Werte / Anzahl → liefert z.B. 1/2 = 0.5
       const sum = arr.reduce((a, b) => a + b, 0);
       return sum / arr.length;
     });
@@ -59,11 +58,11 @@ export default function ChartComponent() {
 
   // Konfiguration für das Chart
   const data = {
-    labels, // ["English", "Math", "General"]
+    labels, // ["English", "Math", "General", "Biologie"]
     datasets: [
       {
         label: "Progress",
-        data: dataValues, // z.B. [1, 0.5, 0]
+        data: dataValues, // z.B. [1, 0.5, 0, 0.75]
         backgroundColor: "rgba(75, 192, 192, 0.2)",
         borderColor: "rgba(75, 192, 192, 1)",
         borderWidth: 1,
@@ -76,12 +75,10 @@ export default function ChartComponent() {
     scales: {
       y: {
         beginAtZero: true,
-        max: 1, // Da Progress zwischen 0 und 1 liegt
+        max: 1, // Progress liegt zwischen 0 und 1
         ticks: {
-          // Y-Achse in Schritten von 0.1 anzeigen (optional)
           stepSize: 0.1,
           callback: (value: number) => {
-            // Formatiere als Dezimalzahl (z. B. 0.5)
             return value.toString();
           },
         },
@@ -93,7 +90,6 @@ export default function ChartComponent() {
       tooltip: {
         callbacks: {
           label: function (context: any) {
-            // Zeige im Tooltip z.B. "Progress: 0.5"
             const val = context.parsed.y;
             return `Progress: ${val}`;
           },
