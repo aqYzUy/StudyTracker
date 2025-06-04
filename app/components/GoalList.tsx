@@ -1,3 +1,4 @@
+// app/components/GoalList.tsx
 import { useGoalStore } from "~/store/useGoalStore";
 import ProgressBar from "./ProgressBar";
 import { FaTrash, FaClock } from "react-icons/fa";
@@ -9,7 +10,10 @@ export default function GoalList() {
   const deleteGoal = useGoalStore((state) => state.deleteGoal);
   const updateDeadline = useGoalStore((state) => state.updateDeadline);
 
-  const categories = Array.from(new Set(goals.map((goal: Goal) => goal.category)));
+  // Gruppiere nach Kategorien
+  const categories = Array.from(
+    new Set(goals.map((goal: Goal) => goal.category))
+  );
   const groupedGoals = categories.map((category) => ({
     category,
     goals: goals.filter((goal: Goal) => goal.category === category),
@@ -33,19 +37,30 @@ export default function GoalList() {
             <ProgressBar goals={goals} />
             <ul className="space-y-3 mt-4">
               {goals.map((goal: Goal) => {
-                const isOverdue = typeof goal.isOverdue === "function" ? goal.isOverdue() : false;
-                // Debugging: Überprüfe den Typ von deadline
+                const isOverdue =
+                  typeof goal.isOverdue === "function" ? goal.isOverdue() : false;
+
+                // Falls deadline nicht vom Typ Date ist, warnen wir und zeigen "Invalid Date"
                 if (goal.deadline && !(goal.deadline instanceof Date)) {
-                  console.warn(`Ungültiges deadline-Objekt für Goal ${goal.id}:`, goal.deadline);
+                  console.warn(
+                    `Ungültiges deadline-Objekt für Goal ${goal.id}:`,
+                    goal.deadline
+                  );
                 }
-                const displayDeadline = goal.deadline instanceof Date && !isNaN(goal.deadline.getTime())
-                  ? goal.deadline.toLocaleDateString()
-                  : "Invalid Date";
+
+                const displayDeadline =
+                  goal.deadline instanceof Date &&
+                  !isNaN(goal.deadline.getTime())
+                    ? goal.deadline.toLocaleDateString()
+                    : "Invalid Date";
+
                 return (
                   <li
                     key={goal.id}
                     className={`flex items-center justify-between p-3 rounded-lg transition-colors duration-200 ${
-                      isOverdue ? "bg-red-100 dark:bg-red-900" : "bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600"
+                      isOverdue
+                        ? "bg-red-100 dark:bg-red-900"
+                        : "bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600"
                     }`}
                   >
                     <div className="flex items-center space-x-3">
@@ -66,29 +81,48 @@ export default function GoalList() {
                         {goal.title}
                         {goal.repeatInterval && (
                           <span className="ml-2 text-sm text-gray-500 dark:text-gray-400">
-                            (Every {goal.repeatInterval} day{goal.repeatInterval > 1 ? "s" : ""})
+                            (Every {goal.repeatInterval} day
+                            {goal.repeatInterval > 1 ? "s" : ""})
                           </span>
                         )}
+                        {/*
+                          Nur wenn deadline jemals ein Date ist, zeigen wir das Icon + Datum:
+                          displayDeadline ist garantiert ein String, weil
+                          „goal.deadline instanceof Date“ vor dem Zugriff geprüft wird.
+                        */}
                         {goal.deadline && (
                           <span className="ml-2 text-sm text-gray-500 dark:text-gray-400">
-                            <FaClock className={isOverdue ? "text-red-500" : ""} />{" "}
+                            <FaClock
+                              className={isOverdue ? "text-red-500" : ""}
+                            />{" "}
                             {displayDeadline}
                           </span>
                         )}
                       </span>
                     </div>
-                    <div>
+                    <div className="flex items-center space-x-2">
                       <button
                         onClick={() => deleteGoal(goal.id as string)}
-                        className="text-red-500 hover:text-red-700 transition-colors duration-200 mr-2"
+                        className="text-red-500 hover:text-red-700 transition-colors duration-200"
                         aria-label={`Delete goal: ${goal.title}`}
                       >
                         <FaTrash size={16} />
                       </button>
+                      {/*
+                        Input-Feld vom Typ date erwartet YYYY-MM-DD.
+                        Wenn goal.deadline eine Date-Instanz ist, konvertieren wir
+                        sie mit toISOString().split("T")[0]. Andernfalls leerer String.
+                      */}
                       <input
                         type="date"
-                        defaultValue={goal.deadline?.toISOString().split("T")[0] || ""}
-                        onChange={(e) => updateDeadline(goal.id as string, e.target.value)}
+                        defaultValue={
+                          goal.deadline instanceof Date
+                            ? goal.deadline.toISOString().split("T")[0]
+                            : ""
+                        }
+                        onChange={(e) =>
+                          updateDeadline(goal.id as string, e.target.value)
+                        }
                         className="p-1 rounded-md border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                       />
                     </div>
