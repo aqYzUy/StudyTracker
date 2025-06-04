@@ -1,9 +1,10 @@
+// app/store/useGoalStore.ts
 import { create } from "zustand";
 import { Goal, GoalData } from "~/models/goal";
 import { v4 as uuidv4 } from "uuid";
 import { persist, createJSONStorage, StateStorage } from "zustand/middleware";
 
-// Benutzerdefinierter Storage-Adapter, der Goal-Instanzen rekonstruiert
+// Benutzerdefinierter Storage-Adapter, der JSON aus localStorage wieder in Goal-Instanzen umwandelt
 const goalStorage: StateStorage = {
   getItem: (name) => {
     const value = localStorage.getItem(name);
@@ -19,7 +20,7 @@ const goalStorage: StateStorage = {
             completed: data.completed ?? false,
             repeatInterval: data.repeatInterval,
             lastCompleted: data.lastCompleted,
-            deadline: data.deadline, // Wird in Goal validiert
+            deadline: data.deadline, // In Goal-Konstruktor wird das validiert
           };
           return new Goal(validData);
         });
@@ -40,7 +41,12 @@ const goalStorage: StateStorage = {
 
 interface GoalStore {
   goals: Goal[];
-  addGoal: (title: string, category: string, repeatInterval?: number, deadline?: string) => void;
+  addGoal: (
+    title: string,
+    category: string,
+    repeatInterval?: number,
+    deadline?: string
+  ) => void;
   toggleGoal: (id: string) => void;
   deleteGoal: (id: string) => void;
   resetRepeatingGoals: () => void;
@@ -62,7 +68,7 @@ export const useGoalStore = create(
               category,
               completed: false,
               repeatInterval,
-              deadline: deadline || undefined, // Nur gültige Deadlines akzeptieren
+              deadline: deadline || undefined,
             }),
           ],
         })),
@@ -100,16 +106,19 @@ export const useGoalStore = create(
               completed: data.completed ?? false,
               repeatInterval: data.repeatInterval,
               lastCompleted: data.lastCompleted,
-              deadline: data.deadline || undefined, // Nur gültige Deadlines akzeptieren
+              deadline: data.deadline || undefined,
             };
             return new Goal(validData);
           }),
         })),
       updateDeadline: (id, deadline) =>
         set((state) => ({
-          goals: state.goals.map((goal) =>
-            goal.id === id ? new Goal({ ...goal.toJSON(), deadline: deadline || undefined }) : goal
-          ),
+          goals: state.goals.map((goal) => {
+            if (goal.id === id) {
+              return new Goal({ ...goal.toJSON(), deadline: deadline || undefined });
+            }
+            return goal;
+          }),
         })),
     }),
     {
