@@ -1,4 +1,5 @@
 // app/components/GoalList.tsx
+
 import { useGoalStore } from "~/store/useGoalStore";
 import ProgressBar from "./ProgressBar";
 import { FaTrash, FaClock } from "react-icons/fa";
@@ -10,7 +11,7 @@ export default function GoalList() {
   const deleteGoal = useGoalStore((state) => state.deleteGoal);
   const updateDeadline = useGoalStore((state) => state.updateDeadline);
 
-  // Gruppiere nach Kategorien
+  // Gruppiere nach Kategorie
   const categories = Array.from(
     new Set(goals.map((goal: Goal) => goal.category))
   );
@@ -40,7 +41,7 @@ export default function GoalList() {
                 const isOverdue =
                   typeof goal.isOverdue === "function" ? goal.isOverdue() : false;
 
-                // Falls deadline nicht vom Typ Date ist, warnen wir und zeigen "Invalid Date"
+                // WARNUNG, falls doch einmal kein Date vorliegt
                 if (goal.deadline && !(goal.deadline instanceof Date)) {
                   console.warn(
                     `Ungültiges deadline-Objekt für Goal ${goal.id}:`,
@@ -85,11 +86,6 @@ export default function GoalList() {
                             {goal.repeatInterval > 1 ? "s" : ""})
                           </span>
                         )}
-                        {/*
-                          Nur wenn deadline jemals ein Date ist, zeigen wir das Icon + Datum:
-                          displayDeadline ist garantiert ein String, weil
-                          „goal.deadline instanceof Date“ vor dem Zugriff geprüft wird.
-                        */}
                         {goal.deadline && (
                           <span className="ml-2 text-sm text-gray-500 dark:text-gray-400">
                             <FaClock
@@ -108,11 +104,6 @@ export default function GoalList() {
                       >
                         <FaTrash size={16} />
                       </button>
-                      {/*
-                        Input-Feld vom Typ date erwartet YYYY-MM-DD.
-                        Wenn goal.deadline eine Date-Instanz ist, konvertieren wir
-                        sie mit toISOString().split("T")[0]. Andernfalls leerer String.
-                      */}
                       <input
                         type="date"
                         defaultValue={
