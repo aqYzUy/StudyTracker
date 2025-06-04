@@ -5,7 +5,7 @@ export interface GoalData {
   completed: boolean;
   repeatInterval?: number;
   lastCompleted?: string;
-  deadline?: string; // Deadline im ISO-Format
+  deadline?: string; // Deadline im ISO-Format (z. B. "2025-06-04")
 }
 
 export class Goal {
@@ -23,14 +23,18 @@ export class Goal {
     this.category = data.category;
     this.completed = data.completed;
     this.repeatInterval = data.repeatInterval;
-    this.lastCompleted = data.lastCompleted ? new Date(data.lastCompleted) : undefined;
-    // Validierung für deadline
+    this.lastCompleted = data.lastCompleted ? this.validateDate(data.lastCompleted) : undefined;
     this.deadline = data.deadline ? this.validateDate(data.deadline) : undefined;
   }
 
   private validateDate(dateStr: string): Date | undefined {
     const date = new Date(dateStr);
-    return isNaN(date.getTime()) ? undefined : date; // Rückgabe undefined bei ungültigem Datum
+    // Prüfe, ob das Datum gültig ist und im ISO-Format entspricht (z. B. "YYYY-MM-DD")
+    if (isNaN(date.getTime()) || !/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+      console.warn(`Ungültiges Datum gefunden: ${dateStr}, wird als undefined behandelt`);
+      return undefined;
+    }
+    return date;
   }
 
   toggleCompleted() {
