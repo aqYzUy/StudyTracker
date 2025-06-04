@@ -1,4 +1,5 @@
 // app/models/goal.ts
+
 export interface GoalData {
   id: string;
   title: string;
@@ -6,7 +7,7 @@ export interface GoalData {
   completed: boolean;
   repeatInterval?: number;
   lastCompleted?: string;
-  deadline?: string; // kann ISO-String sein, z. B. "2025-06-04" oder "2025-06-04T00:00:00.000Z"
+  deadline?: string; // ISO-String, z. B. "2025-06-04" oder "2025-06-04T00:00:00.000Z"
 }
 
 export class Goal {
@@ -34,7 +35,7 @@ export class Goal {
 
   private validateDate(dateStr: string): Date | undefined {
     const date = new Date(dateStr);
-    // Nur validieren über isNaN(date.getTime()). Akzeptiert ISO-Strings
+    // Nur validieren über isNaN(date.getTime()). Akzeptiert alle ISO-Strings.
     if (isNaN(date.getTime())) {
       console.warn(`Ungültiges Datum gefunden: ${dateStr}, wird als undefined behandelt`);
       return undefined;
