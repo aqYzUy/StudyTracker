@@ -19,7 +19,7 @@ const goalStorage: StateStorage = {
             completed: data.completed ?? false,
             repeatInterval: data.repeatInterval,
             lastCompleted: data.lastCompleted,
-            deadline: data.deadline,
+            deadline: data.deadline, // Wird in Goal validiert
           };
           return new Goal(validData);
         });
@@ -62,7 +62,7 @@ export const useGoalStore = create(
               category,
               completed: false,
               repeatInterval,
-              deadline,
+              deadline: deadline || undefined, // Nur gültige Deadlines akzeptieren
             }),
           ],
         })),
@@ -100,7 +100,7 @@ export const useGoalStore = create(
               completed: data.completed ?? false,
               repeatInterval: data.repeatInterval,
               lastCompleted: data.lastCompleted,
-              deadline: data.deadline,
+              deadline: data.deadline || undefined, // Nur gültige Deadlines akzeptieren
             };
             return new Goal(validData);
           }),
@@ -108,7 +108,7 @@ export const useGoalStore = create(
       updateDeadline: (id, deadline) =>
         set((state) => ({
           goals: state.goals.map((goal) =>
-            goal.id === id ? new Goal({ ...goal.toJSON(), deadline }) : goal
+            goal.id === id ? new Goal({ ...goal.toJSON(), deadline: deadline || undefined }) : goal
           ),
         })),
     }),
