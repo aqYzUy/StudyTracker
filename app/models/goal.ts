@@ -5,7 +5,7 @@ export interface GoalData {
   completed: boolean;
   repeatInterval?: number;
   lastCompleted?: string;
-  deadline?: string; // Neuer: Deadline im ISO-Format
+  deadline?: string; // Deadline im ISO-Format
 }
 
 export class Goal {
@@ -42,7 +42,8 @@ export class Goal {
   }
 
   isOverdue(): boolean {
-    return !!this.deadline && new Date() > this.deadline && !this.completed;
+    if (!this.deadline) return false;
+    return new Date() > this.deadline && !this.completed;
   }
 
   progress(): number {
