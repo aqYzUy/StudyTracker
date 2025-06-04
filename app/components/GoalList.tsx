@@ -32,59 +32,62 @@ export default function GoalList() {
             </h2>
             <ProgressBar goals={goals} />
             <ul className="space-y-3 mt-4">
-              {goals.map((goal: Goal) => (
-                <li
-                  key={goal.id}
-                  className={`flex items-center justify-between p-3 rounded-lg transition-colors duration-200 ${
-                    goal.isOverdue() ? "bg-red-100 dark:bg-red-900" : "bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600"
-                  }`}
-                >
-                  <div className="flex items-center space-x-3">
-                    <input
-                      type="checkbox"
-                      checked={goal.completed || false}
-                      onChange={() => toggleGoal(goal.id as string)}
-                      className="h-5 w-5 text-indigo-600 focus:ring-indigo-500 rounded cursor-pointer"
-                      aria-label={`Mark ${goal.title} as completed`}
-                    />
-                    <span
-                      className={
-                        goal.completed
-                          ? "line-through text-gray-500 dark:text-gray-400"
-                          : "text-gray-800 dark:text-gray-200"
-                      }
-                    >
-                      {goal.title}
-                      {goal.repeatInterval && (
-                        <span className="ml-2 text-sm text-gray-500 dark:text-gray-400">
-                          (Every {goal.repeatInterval} day{goal.repeatInterval > 1 ? "s" : ""})
-                        </span>
-                      )}
-                      {goal.deadline && (
-                        <span className="ml-2 text-sm text-gray-500 dark:text-gray-400">
-                          <FaClock className={goal.isOverdue() ? "text-red-500" : ""} />{" "}
-                          {goal.deadline.toLocaleDateString()}
-                        </span>
-                      )}
-                    </span>
-                  </div>
-                  <div>
-                    <button
-                      onClick={() => deleteGoal(goal.id as string)}
-                      className="text-red-500 hover:text-red-700 transition-colors duration-200 mr-2"
-                      aria-label={`Delete goal: ${goal.title}`}
-                    >
-                      <FaTrash size={16} />
-                    </button>
-                    <input
-                      type="date"
-                      defaultValue={goal.deadline?.toISOString().split("T")[0]}
-                      onChange={(e) => updateDeadline(goal.id as string, e.target.value)}
-                      className="p-1 rounded-md border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                    />
-                  </div>
-                </li>
-              ))}
+              {goals.map((goal: Goal) => {
+                const isOverdue = typeof goal.isOverdue === "function" ? goal.isOverdue() : false;
+                return (
+                  <li
+                    key={goal.id}
+                    className={`flex items-center justify-between p-3 rounded-lg transition-colors duration-200 ${
+                      isOverdue ? "bg-red-100 dark:bg-red-900" : "bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600"
+                    }`}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <input
+                        type="checkbox"
+                        checked={goal.completed || false}
+                        onChange={() => toggleGoal(goal.id as string)}
+                        className="h-5 w-5 text-indigo-600 focus:ring-indigo-500 rounded cursor-pointer"
+                        aria-label={`Mark ${goal.title} as completed`}
+                      />
+                      <span
+                        className={
+                          goal.completed
+                            ? "line-through text-gray-500 dark:text-gray-400"
+                            : "text-gray-800 dark:text-gray-200"
+                        }
+                      >
+                        {goal.title}
+                        {goal.repeatInterval && (
+                          <span className="ml-2 text-sm text-gray-500 dark:text-gray-400">
+                            (Every {goal.repeatInterval} day{goal.repeatInterval > 1 ? "s" : ""})
+                          </span>
+                        )}
+                        {goal.deadline && (
+                          <span className="ml-2 text-sm text-gray-500 dark:text-gray-400">
+                            <FaClock className={isOverdue ? "text-red-500" : ""} />{" "}
+                            {goal.deadline.toLocaleDateString()}
+                          </span>
+                        )}
+                      </span>
+                    </div>
+                    <div>
+                      <button
+                        onClick={() => deleteGoal(goal.id as string)}
+                        className="text-red-500 hover:text-red-700 transition-colors duration-200 mr-2"
+                        aria-label={`Delete goal: ${goal.title}`}
+                      >
+                        <FaTrash size={16} />
+                      </button>
+                      <input
+                        type="date"
+                        defaultValue={goal.deadline?.toISOString().split("T")[0]}
+                        onChange={(e) => updateDeadline(goal.id as string, e.target.value)}
+                        className="p-1 rounded-md border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      />
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           </div>
         ))
