@@ -1,3 +1,4 @@
+// app/models/goal.ts
 export interface GoalData {
   id: string;
   title: string;
@@ -5,7 +6,7 @@ export interface GoalData {
   completed: boolean;
   repeatInterval?: number;
   lastCompleted?: string;
-  deadline?: string; // Deadline im ISO-Format (z. B. "2025-06-04")
+  deadline?: string; // kann ISO-String sein, z. B. "2025-06-04" oder "2025-06-04T00:00:00.000Z"
 }
 
 export class Goal {
@@ -23,14 +24,18 @@ export class Goal {
     this.category = data.category;
     this.completed = data.completed;
     this.repeatInterval = data.repeatInterval;
-    this.lastCompleted = data.lastCompleted ? this.validateDate(data.lastCompleted) : undefined;
-    this.deadline = data.deadline ? this.validateDate(data.deadline) : undefined;
+    this.lastCompleted = data.lastCompleted
+      ? this.validateDate(data.lastCompleted)
+      : undefined;
+    this.deadline = data.deadline
+      ? this.validateDate(data.deadline)
+      : undefined;
   }
 
   private validateDate(dateStr: string): Date | undefined {
     const date = new Date(dateStr);
-    // Prüfe, ob das Datum gültig ist und im ISO-Format entspricht (z. B. "YYYY-MM-DD")
-    if (isNaN(date.getTime()) || !/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+    // Nur validieren über isNaN(date.getTime()). Akzeptiert ISO-Strings
+    if (isNaN(date.getTime())) {
       console.warn(`Ungültiges Datum gefunden: ${dateStr}, wird als undefined behandelt`);
       return undefined;
     }
@@ -47,7 +52,8 @@ export class Goal {
   shouldReset(): boolean {
     if (!this.repeatInterval || !this.lastCompleted) return false;
     const now = new Date();
-    const diffDays = (now.getTime() - this.lastCompleted.getTime()) / (1000 * 60 * 60 * 24);
+    const diffDays =
+      (now.getTime() - this.lastCompleted.getTime()) / (1000 * 60 * 60 * 24);
     return diffDays >= this.repeatInterval;
   }
 
